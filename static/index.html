@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/jquery-ui.min.css" />
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-ui.js"></script>
+</head>
+<body>
+<div>
+    <div class="box">
+        <h1>头条搜索</h1>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="请输入">
+            <button id="searchBtn">search</button>
+        </div>
+    </div>
+     <div class="content">
+         <div class="content-item" onclick="toUrl(this)">
+         </div>
+     </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("#search").autocomplete({
+            source:function(request, response) {
+                $.ajax({
+                    type : "GET",
+                    url : "https://i.snssdk.com/search/api/sug",
+                    data : "keyword=" + request.term,
+                    dataType : "json",
+                    success : function(data) {
+                        var result = data.data.map(item =>{
+                            return item.keyword
+                        })
+                        // 解析为js对象
+                        response(result);
+                    },
+                    error : function() {
+                        alert("错误");
+                    }
+                })
+            },
+            minLength:2
+        })
+
+        $('#searchBtn').click(function() {
+            $.ajax({
+                type : "GET",
+                url : "https://i.snssdk.com/search/api/study",
+                data : "keyword=" + $("#search").val(),
+                dataType : "json",
+                success : function(data) {
+                    $(".content").empty()
+                    if(data.code===0){
+                        data.data.forEach(item=>{
+                            $(".content").append("<div class=\"content-item\" data-url=" + item.link_url + " onclick=\"toUrl(this)\">\n" +
+                                "             <h3 class=\"content-title\">" + item.title+ "</h3>\n" +
+                                "             <p class=\"content-description\">" + item.description + "</p>\n" +
+                                "             <h5><label>作者:</label><span>"+ item.user_name +"</span></h5>\n" +
+                                "             <h5><label>时间:</label><span>"+ new Date(item.create_time).getFullYear()+"-"+ (new Date(item.create_time).getMonth()+1)+"</span></h5>\n" +
+                                "         </div>")
+                        })
+                    }
+                },
+                error : function() {
+                    alert("搜索错误");
+                }
+            })
+        });
+    });
+
+    function toUrl(data) {
+        var url = data.attributes["data-url"].value
+        window.open(url, '_blank').location;
+    }
+</script>
+</body>
+</html>
