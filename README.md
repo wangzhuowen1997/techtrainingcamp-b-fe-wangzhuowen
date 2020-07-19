@@ -9,7 +9,7 @@ node环境
 目录结构描述    
 ├── Readme.md                   // help  
 ├── static                      // web静态资源加载  
-│   ├── css
+│   ├── css  
 │   │   ├── index.css           
 │   │   └── jquery-ui.min.css            
 │   ├── css  
